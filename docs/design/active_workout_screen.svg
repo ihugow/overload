@@ -1,0 +1,381 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 1060" width="390" height="1060" fill="none">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Montserrat:wght@700;800;900&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap');
+      .font-heading { font-family: 'Montserrat', sans-serif; }
+      .font-tech { font-family: 'Space Grotesk', monospace, sans-serif; }
+      .font-body { font-family: 'Manrope', sans-serif; }
+    </style>
+    <filter id="glowVolt" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <filter id="glowViolet" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <linearGradient id="cardGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1F1F23" />
+      <stop offset="100%" stop-color="#1B1B1F" />
+    </linearGradient>
+    <linearGradient id="refGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1F132B" />
+      <stop offset="50%" stop-color="#1F1F23" />
+      <stop offset="100%" stop-color="#1A1A1E" />
+    </linearGradient>
+    <linearGradient id="restGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#221630" />
+      <stop offset="100%" stop-color="#17171C" />
+    </linearGradient>
+  </defs>
+
+  <!-- BACKGROUND CANVAS (Obsidian #0E0E12) -->
+  <rect width="390" height="1060" fill="#0E0E12" />
+
+  <!-- STATUS BAR (09:41) -->
+  <g id="StatusBar">
+    <text x="32" y="28" fill="#FFFFFF" font-size="13" font-weight="700" class="font-tech">09:41</text>
+    <!-- Dynamic Island / Pill -->
+    <rect x="145" y="14" width="100" height="22" rx="11" fill="#000000" />
+    <!-- Icons Battery & Signal -->
+    <g transform="translate(325, 17)" fill="#ACAAB0">
+      <path d="M1 8h3v5H1zm5-3h3v8H6zm5-3h3v11h-3z" />
+      <rect x="17" y="2" width="18" height="9" rx="2.5" stroke="#ACAAB0" stroke-width="1.5" fill="none" />
+      <rect x="19" y="4" width="11" height="5" rx="1" fill="#FFFFFF" />
+      <path d="M36 5.5v2" stroke="#ACAAB0" stroke-width="1.5" stroke-linecap="round" />
+    </g>
+  </g>
+
+  <!-- TOP APP BAR -->
+  <g id="TopAppBar" transform="translate(0, 48)">
+    <line x1="0" y1="54" x2="390" y2="54" stroke="#1F1F23" stroke-width="1" />
+    <!-- Back Button -->
+    <rect x="16" y="8" width="36" height="36" rx="18" fill="#1F1F23" />
+    <path d="M37 20l-6 6 6 6" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Center Titles -->
+    <g transform="translate(195, 20)" text-anchor="middle">
+      <circle cx="-42" cy="-1" r="3.5" fill="#CCFF00" />
+      <text x="0" y="2" fill="#CEACEF" font-size="10" font-weight="700" letter-spacing="0.08em" class="font-tech">TREINO ATIVO</text>
+      <text x="0" y="20" fill="#FFFFFF" font-size="14" font-weight="900" class="font-heading">Treino A — Push</text>
+    </g>
+
+    <!-- Finalizar Button -->
+    <g transform="translate(302, 10)">
+      <rect width="72" height="32" rx="8" fill="#660CAA" filter="url(#glowViolet)" />
+      <rect width="72" height="32" rx="8" fill="#660CAA" />
+      <text x="36" y="20" fill="#FFFFFF" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="0.05em" class="font-tech">FINALIZAR</text>
+    </g>
+  </g>
+
+  <!-- TELEMETRY SUB-BAR -->
+  <g id="TelemetryBar" transform="translate(0, 104)">
+    <rect width="390" height="32" fill="#17171C" />
+    <line x1="0" y1="32" x2="390" y2="32" stroke="#252429" stroke-width="1" />
+
+    <!-- Elapsed Timer -->
+    <g transform="translate(16, 20)">
+      <circle cx="6" cy="0" r="5.5" stroke="#CCFF00" stroke-width="1.5" fill="none" />
+      <polyline points="6,-2 6,0 8,1" stroke="#CCFF00" stroke-width="1.2" fill="none" stroke-linecap="round" />
+      <text x="16" y="4" fill="#ACAAB0" font-size="11" class="font-tech">Tempo: <tspan fill="#FFFFFF" font-weight="700">00:24:18</tspan></text>
+    </g>
+
+    <!-- Offline-First SQLite Drift Badge -->
+    <g transform="translate(250, 7)">
+      <rect width="124" height="18" rx="9" fill="#1F1F23" stroke="#353439" stroke-width="1" />
+      <circle cx="10" cy="9" r="3" fill="#CCFF00" />
+      <text x="18" y="13" fill="#ACAAB0" font-size="10" class="font-tech">Salvo local <tspan fill="#666666">• 0 pend</tspan></text>
+    </g>
+  </g>
+
+  <!-- WORKOUT STEPPER (EXERCÍCIO 1 DE 6) -->
+  <g id="Stepper" transform="translate(16, 148)">
+    <text x="0" y="10" fill="#ACAAB0" font-size="11" font-weight="700" letter-spacing="0.05em" class="font-tech">
+      EXERCÍCIO <tspan fill="#CCFF00">1</tspan> DE 6
+    </text>
+    <text x="358" y="10" fill="#ACAAB0" font-size="11" text-anchor="end" class="font-tech">Peito &amp; Ombros</text>
+
+    <!-- Progress Bars -->
+    <g transform="translate(0, 18)">
+      <rect x="0" y="0" width="55" height="5" rx="2.5" fill="#CCFF00" filter="url(#glowVolt)" />
+      <rect x="0" y="0" width="55" height="5" rx="2.5" fill="#CCFF00" />
+      <rect x="61" y="0" width="55" height="5" rx="2.5" fill="#353439" />
+      <rect x="122" y="0" width="55" height="5" rx="2.5" fill="#353439" />
+      <rect x="183" y="0" width="55" height="5" rx="2.5" fill="#353439" />
+      <rect x="244" y="0" width="55" height="5" rx="2.5" fill="#353439" />
+      <rect x="305" y="0" width="53" height="5" rx="2.5" fill="#353439" />
+    </g>
+  </g>
+
+  <!-- CURRENT EXERCISE HERO CARD (SUPINO RETO) -->
+  <g id="ExerciseHeroCard" transform="translate(16, 186)">
+    <rect width="358" height="144" rx="16" fill="url(#cardGrad)" stroke="#353439" stroke-width="1" />
+
+    <!-- Violet Glow Ambient -->
+    <circle cx="320" cy="30" r="60" fill="#660CAA" opacity="0.25" filter="url(#glowViolet)" />
+
+    <!-- Tag & Target -->
+    <g transform="translate(16, 20)">
+      <rect width="126" height="20" rx="4" fill="#660CAA" fill-opacity="0.3" stroke="#8918DF" stroke-width="1" stroke-opacity="0.6" />
+      <text x="63" y="14" fill="#CEACEF" font-size="9" font-weight="700" text-anchor="middle" letter-spacing="0.06em" class="font-tech">COMPOSTO PRINCIPAL</text>
+      <text x="136" y="14" fill="#ACAAB0" font-size="11" class="font-tech">Meta: 4 séries • 6-8 reps</text>
+    </g>
+
+    <!-- Title & Subtitle -->
+    <text x="16" y="64" fill="#FFFFFF" font-size="17" font-weight="900" class="font-heading">Supino Reto com Barra Olímpica</text>
+    <text x="16" y="82" fill="#ACAAB0" font-size="11" class="font-body">Peitoral Maior • Carga total (Barra 20kg + Anilhas)</text>
+
+    <!-- Number Badge 01 -->
+    <g transform="translate(310, 16)">
+      <rect width="32" height="32" rx="8" fill="#2A292E" stroke="#353439" stroke-width="1" />
+      <text x="16" y="21" fill="#8918DF" font-size="13" font-weight="700" text-anchor="middle" class="font-tech">01</text>
+    </g>
+
+    <!-- Action Buttons (Vídeo, Substituir, Ajustes) -->
+    <line x1="16" y1="98" x2="342" y2="98" stroke="#2A292E" stroke-width="1" />
+
+    <!-- Video Button -->
+    <g transform="translate(16, 106)">
+      <rect width="102" height="28" rx="8" fill="#2A292E" stroke="#353439" stroke-width="1" />
+      <polygon points="12,8 12,20 22,14" fill="#CCFF00" />
+      <text x="28" y="18" fill="#FFFFFF" font-size="11" font-weight="600" class="font-tech">Execução</text>
+    </g>
+
+    <!-- Substituir Button -->
+    <g transform="translate(126, 106)">
+      <rect width="106" height="28" rx="8" fill="#2A292E" stroke="#353439" stroke-width="1" />
+      <path d="M14 11h12m0 0l-3-3m3 3l-3 3m-6 3H8m0 0l3 3m-3-3l3-3" stroke="#CEACEF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+      <text x="32" y="18" fill="#FFFFFF" font-size="11" font-weight="600" class="font-tech">Substituir</text>
+    </g>
+
+    <!-- Ajustes Button -->
+    <g transform="translate(240, 106)">
+      <rect width="102" height="28" rx="8" fill="#2A292E" stroke="#353439" stroke-width="1" />
+      <path d="M16 9v10m6-6v6m-12-2v2" stroke="#ACAAB0" stroke-width="1.5" stroke-linecap="round" />
+      <text x="28" y="18" fill="#FFFFFF" font-size="11" font-weight="600" class="font-tech">Ajustes</text>
+    </g>
+  </g>
+
+  <!-- PREVIOUS REFERENCE BANNER (RF08 & RF15) -->
+  <g id="PreviousReference" transform="translate(16, 342)">
+    <rect width="358" height="52" rx="12" fill="url(#refGrad)" stroke="#8918DF" stroke-width="1" stroke-opacity="0.4" />
+
+    <circle cx="16" cy="18" r="3" fill="#8918DF" />
+    <text x="26" y="21" fill="#CEACEF" font-size="9" font-weight="700" letter-spacing="0.07em" class="font-tech">REFERÊNCIA ANTERIOR (08/10)</text>
+
+    <text x="16" y="39" fill="#FFFFFF" font-size="11" class="font-tech">
+      Último: <tspan fill="#CCFF00" font-weight="700">80 kg</tspan> × 8 reps <tspan fill="#ACAAB0">(4 séries feitas)</tspan>
+    </text>
+
+    <!-- Button Copiar -->
+    <g transform="translate(276, 12)">
+      <rect width="68" height="28" rx="8" fill="#2A292E" stroke="#8918DF" stroke-width="1" stroke-opacity="0.6" />
+      <text x="34" y="18" fill="#CEACEF" font-size="11" font-weight="700" text-anchor="middle" class="font-tech">⚡ Copiar</text>
+    </g>
+  </g>
+
+  <!-- SETS MATRIX (RF07, RF06, RNF04) -->
+  <g id="SetsMatrix" transform="translate(16, 406)">
+    <rect width="358" height="352" rx="16" fill="#1F1F23" stroke="#353439" stroke-width="1" />
+
+    <!-- Table Header -->
+    <text x="16" y="24" fill="#FFFFFF" font-size="12" font-weight="900" letter-spacing="0.05em" class="font-heading">SÉRIES &amp; CARGAS</text>
+    <text x="342" y="24" fill="#ACAAB0" font-size="10" text-anchor="end" class="font-tech">Descanso padrão: 90s</text>
+
+    <!-- Column Labels -->
+    <g transform="translate(0, 44)" fill="#727077" font-size="10" font-weight="700" letter-spacing="0.05em" class="font-tech" text-anchor="middle">
+      <text x="36" y="0">TIPO</text>
+      <text x="108" y="0">ANTERIOR</text>
+      <text x="196" y="0">CARGA (KG)</text>
+      <text x="272" y="0">REPS</text>
+      <text x="328" y="0">CHECK</text>
+    </g>
+
+    <!-- ROW 1: AQUECIMENTO (CONCLUÍDO) -->
+    <g id="SetRow1" transform="translate(12, 54)">
+      <rect width="334" height="40" rx="10" fill="#17171C" stroke="#2A292E" stroke-width="1" />
+      <!-- Badge A (Aquecimento) -->
+      <rect x="10" y="8" width="24" height="24" rx="6" fill="#EAB308" fill-opacity="0.2" stroke="#EAB308" stroke-width="1" stroke-opacity="0.4" />
+      <text x="22" y="24" fill="#FACC15" font-size="11" font-weight="700" text-anchor="middle" class="font-tech">A</text>
+      <!-- Anterior -->
+      <text x="96" y="24" fill="#ACAAB0" font-size="11" text-anchor="middle" class="font-tech">40kg × 12</text>
+      <!-- Carga box -->
+      <rect x="156" y="6" width="56" height="28" rx="6" fill="#101014" stroke="#2A292E" stroke-width="1" />
+      <text x="184" y="24" fill="#ACAAB0" font-size="12" font-weight="700" text-anchor="middle" class="font-tech">40</text>
+      <!-- Reps box -->
+      <rect x="232" y="6" width="50" height="28" rx="6" fill="#101014" stroke="#2A292E" stroke-width="1" />
+      <text x="257" y="24" fill="#ACAAB0" font-size="12" font-weight="700" text-anchor="middle" class="font-tech">12</text>
+      <!-- Check button (Active Green) -->
+      <rect x="300" y="6" width="28" height="28" rx="8" fill="#CCFF00" filter="url(#glowVolt)" />
+      <rect x="300" y="6" width="28" height="28" rx="8" fill="#CCFF00" />
+      <path d="M308 20l4 4 8-8" stroke="#161E00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    </g>
+
+    <!-- ROW 2: TRABALHO SÉRIE 1 (ATIVA / EM FOCO) -->
+    <g id="SetRow2" transform="translate(12, 102)">
+      <!-- Highlighting Border with Kinetic Volt -->
+      <rect width="334" height="102" rx="12" fill="#25242C" stroke="#CCFF00" stroke-width="2" />
+
+      <!-- Top Row -->
+      <g transform="translate(0, 8)">
+        <!-- Badge 1 (Violet) -->
+        <rect x="10" y="6" width="24" height="24" rx="6" fill="#660CAA" />
+        <text x="22" y="22" fill="#FFFFFF" font-size="11" font-weight="700" text-anchor="middle" class="font-tech">1</text>
+        <!-- Anterior -->
+        <text x="96" y="22" fill="#FFFFFF" font-size="11" text-anchor="middle" class="font-tech">80kg × 8</text>
+        <!-- Carga Box Focus -->
+        <rect x="156" y="4" width="56" height="28" rx="8" fill="#101014" stroke="#CCFF00" stroke-width="1.5" />
+        <text x="184" y="22" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle" class="font-tech">80</text>
+        <!-- Reps Box Focus -->
+        <rect x="232" y="4" width="50" height="28" rx="8" fill="#101014" stroke="#CCFF00" stroke-width="1.5" />
+        <text x="257" y="22" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle" class="font-tech">8</text>
+        <!-- Check Button Big -->
+        <rect x="300" y="4" width="28" height="28" rx="8" fill="#CCFF00" filter="url(#glowVolt)" />
+        <rect x="300" y="4" width="28" height="28" rx="8" fill="#CCFF00" />
+        <path d="M308 18l4 4 8-8" stroke="#161E00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+      </g>
+
+      <!-- Quick Increments (-2kg, +1kg, +2kg, +5kg) -->
+      <line x1="12" y1="48" x2="322" y2="48" stroke="#353439" stroke-width="1" />
+      <g transform="translate(12, 54)">
+        <text x="0" y="16" fill="#CEACEF" font-size="10" font-weight="700" class="font-tech">AJUSTE RÁPIDO:</text>
+        <!-- Buttons -->
+        <g transform="translate(144, 4)">
+          <rect x="0" y="0" width="38" height="20" rx="4" fill="#1F1F23" stroke="#353439" stroke-width="1" />
+          <text x="19" y="14" fill="#ACAAB0" font-size="10" text-anchor="middle" class="font-tech">-2kg</text>
+
+          <rect x="44" y="0" width="38" height="20" rx="4" fill="#1F1F23" stroke="#353439" stroke-width="1" />
+          <text x="63" y="14" fill="#CCFF00" font-size="10" font-weight="700" text-anchor="middle" class="font-tech">+1kg</text>
+
+          <rect x="88" y="0" width="38" height="20" rx="4" fill="#1F1F23" stroke="#353439" stroke-width="1" />
+          <text x="107" y="14" fill="#CCFF00" font-size="10" font-weight="700" text-anchor="middle" class="font-tech">+2kg</text>
+
+          <rect x="132" y="0" width="38" height="20" rx="4" fill="#1F1F23" stroke="#353439" stroke-width="1" />
+          <text x="151" y="14" fill="#CCFF00" font-size="10" font-weight="700" text-anchor="middle" class="font-tech">+5kg</text>
+        </g>
+      </g>
+
+      <!-- RIR / Falha Controls -->
+      <g transform="translate(12, 82)">
+        <text x="0" y="12" fill="#ACAAB0" font-size="10" class="font-tech">RIR: <tspan fill="#FFFFFF" font-weight="700">2 (2 na reserva)</tspan></text>
+        <g transform="translate(240, 2)">
+          <rect width="12" height="12" rx="2" stroke="#353439" stroke-width="1" fill="#101014" />
+          <text x="18" y="10" fill="#EF4444" font-size="10" font-weight="700" class="font-tech">FALHA TOTAL</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- ROW 3: TRABALHO SÉRIE 2 (PENDENTE) -->
+    <g id="SetRow3" transform="translate(12, 212)" opacity="0.7">
+      <rect width="334" height="40" rx="10" fill="#17171C" stroke="#2A292E" stroke-width="1" />
+      <rect x="10" y="8" width="24" height="24" rx="6" fill="#2A292E" />
+      <text x="22" y="24" fill="#ACAAB0" font-size="11" font-weight="700" text-anchor="middle" class="font-tech">2</text>
+      <text x="96" y="24" fill="#666666" font-size="11" text-anchor="middle" class="font-tech">80kg × 8</text>
+      <rect x="156" y="6" width="56" height="28" rx="6" fill="#101014" stroke="#2A292E" stroke-width="1" />
+      <text x="184" y="24" fill="#666666" font-size="12" font-weight="700" text-anchor="middle" class="font-tech">80</text>
+      <rect x="232" y="6" width="50" height="28" rx="6" fill="#101014" stroke="#2A292E" stroke-width="1" />
+      <text x="257" y="24" fill="#666666" font-size="12" font-weight="700" text-anchor="middle" class="font-tech">8</text>
+      <rect x="300" y="6" width="28" height="28" rx="8" fill="#2A292E" />
+      <path d="M308 20l4 4 8-8" stroke="#444444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    </g>
+
+    <!-- ROW 4: TRABALHO SÉRIE 3 (PENDENTE) -->
+    <g id="SetRow4" transform="translate(12, 260)" opacity="0.5">
+      <rect width="334" height="40" rx="10" fill="#17171C" stroke="#2A292E" stroke-width="1" />
+      <rect x="10" y="8" width="24" height="24" rx="6" fill="#2A292E" />
+      <text x="22" y="24" fill="#ACAAB0" font-size="11" font-weight="700" text-anchor="middle" class="font-tech">3</text>
+      <text x="96" y="24" fill="#666666" font-size="11" text-anchor="middle" class="font-tech">80kg × 6</text>
+      <rect x="156" y="6" width="56" height="28" rx="6" fill="#101014" stroke="#2A292E" stroke-width="1" />
+      <text x="184" y="24" fill="#666666" font-size="12" font-weight="700" text-anchor="middle" class="font-tech">80</text>
+      <rect x="232" y="6" width="50" height="28" rx="6" fill="#101014" stroke="#2A292E" stroke-width="1" />
+      <text x="257" y="24" fill="#666666" font-size="12" font-weight="700" text-anchor="middle" class="font-tech">6</text>
+      <rect x="300" y="6" width="28" height="28" rx="8" fill="#2A292E" />
+      <path d="M308 20l4 4 8-8" stroke="#444444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    </g>
+
+    <!-- BOTÃO ADICIONAR SÉRIE -->
+    <g transform="translate(12, 308)">
+      <rect width="334" height="34" rx="10" fill="none" stroke="#353439" stroke-width="1" stroke-dasharray="4 4" />
+      <text x="167" y="22" fill="#ACAAB0" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="0.05em" class="font-tech">
+        + ADICIONAR SÉRIE
+      </text>
+    </g>
+  </g>
+
+  <!-- NEXT EXERCISE PREVIEW (A SEGUIR) -->
+  <g id="NextExercisePreview" transform="translate(16, 768)">
+    <rect width="358" height="52" rx="12" fill="#17171C" stroke="#2A292E" stroke-width="1" />
+    <g transform="translate(16, 18)">
+      <text x="0" y="0" fill="#727077" font-size="9" font-weight="700" letter-spacing="0.06em" class="font-tech">A SEGUIR (EXERCÍCIO 02)</text>
+      <text x="0" y="16" fill="#FFFFFF" font-size="12" font-weight="700" class="font-heading">Desenvolvimento Halteres Banco 75°</text>
+      <text x="0" y="28" fill="#ACAAB0" font-size="10" class="font-tech">3 séries • 24kg por halter</text>
+    </g>
+    <!-- Chevron -->
+    <g transform="translate(322, 16)">
+      <rect width="24" height="24" rx="6" fill="#2A292E" />
+      <path d="M9 6l6 6-6 6" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+
+  <!-- PERSISTENT REST TIMER BAR (RF09) -->
+  <g id="PersistentRestTimer" transform="translate(12, 830)">
+    <!-- Outer Glow & Border -->
+    <rect width="366" height="62" rx="16" fill="url(#restGrad)" stroke="#CCFF00" stroke-width="1.5" filter="url(#glowVolt)" />
+    <rect width="366" height="62" rx="16" fill="url(#restGrad)" stroke="#CCFF00" stroke-width="1.5" />
+
+    <!-- Progress fill background (65%) -->
+    <rect width="238" height="62" rx="16" fill="#CCFF00" fill-opacity="0.08" />
+
+    <!-- Icon & Status -->
+    <g transform="translate(16, 13)">
+      <circle cx="18" cy="18" r="16" fill="#101014" stroke="#CCFF00" stroke-width="1.5" />
+      <polyline points="18,10 18,18 23,21" stroke="#CCFF00" stroke-width="1.8" stroke-linecap="round" fill="none" />
+
+      <g transform="translate(44, 4)">
+        <circle cx="0" cy="6" r="3" fill="#CCFF00" />
+        <text x="8" y="10" fill="#CCFF00" font-size="10" font-weight="700" letter-spacing="0.06em" class="font-tech">DESCANSO EM CURSO</text>
+        <text x="0" y="28" fill="#FFFFFF" font-size="18" font-weight="900" letter-spacing="0.05em" class="font-tech">
+          01:08 <tspan fill="#727077" font-size="11" font-weight="500">/ 01:30</tspan>
+        </text>
+      </g>
+    </g>
+
+    <!-- Quick Action Buttons (+30s / Pular) -->
+    <g transform="translate(244, 16)">
+      <!-- +30s -->
+      <rect x="0" y="0" width="46" height="30" rx="8" fill="#25242C" stroke="#353439" stroke-width="1" />
+      <text x="23" y="19" fill="#CCFF00" font-size="11" font-weight="700" text-anchor="middle" class="font-tech">+30s</text>
+
+      <!-- Pular -->
+      <rect x="52" y="0" width="54" height="30" rx="8" fill="#660CAA" filter="url(#glowViolet)" />
+      <rect x="52" y="0" width="54" height="30" rx="8" fill="#660CAA" />
+      <text x="79" y="19" fill="#FFFFFF" font-size="11" font-weight="700" text-anchor="middle" class="font-tech">Pular</text>
+    </g>
+  </g>
+
+  <!-- BOTTOM NAVIGATION BAR (DOCK) -->
+  <g id="BottomNav" transform="translate(0, 996)">
+    <line x1="0" y1="0" x2="390" y2="0" stroke="#1F1F23" stroke-width="1" />
+    <rect width="390" height="64" fill="#0E0E12" />
+
+    <!-- Anterior Button (Disabled) -->
+    <g transform="translate(16, 14)">
+      <rect width="82" height="36" rx="10" fill="#17171C" />
+      <path d="M22 18l-4 4 4 4" stroke="#444444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      <text x="48" y="23" fill="#555555" font-size="11" font-weight="700" text-anchor="middle" class="font-tech">Anterior</text>
+    </g>
+
+    <!-- Center Series Counter -->
+    <text x="195" y="36" fill="#ACAAB0" font-size="11" font-weight="600" text-anchor="middle" class="font-tech">
+      4 de 18 séries feitas
+    </text>
+
+    <!-- Próximo Button (Active) -->
+    <g transform="translate(292, 14)">
+      <rect width="82" height="36" rx="10" fill="#2A292E" stroke="#353439" stroke-width="1" />
+      <text x="34" y="23" fill="#CCFF00" font-size="11" font-weight="700" text-anchor="middle" class="font-tech">Próximo</text>
+      <path d="M58 18l4 4-4 4" stroke="#CCFF00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+
+</svg>

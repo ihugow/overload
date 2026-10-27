@@ -1,0 +1,19 @@
+work/
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.flutter-plugins-dependencies
+.env
+.env.*
+!.env.example
+*.iml
+.idea/
+android/local.properties
+android/.gradle/
+android/key.properties
+*.jks
+*.keystore
+coverage/
+# Widget Preview related
+.widget_preview/

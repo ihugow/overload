@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+project_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -n "${OVERLOAD_FLUTTER_SDK:-}" ]]; then
+  exec "$OVERLOAD_FLUTTER_SDK/bin/flutter" "$@"
+elif [[ -x "$project_root/work/tooling/flutter/bin/flutter" ]]; then
+  exec "$project_root/work/tooling/flutter/bin/flutter" "$@"
+else
+  exec flutter "$@"
+fi

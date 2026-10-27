@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overload — Protótipo de Treino Ativo (Execução)</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Montserrat:wght@700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+    :root {
+      --bg-canvas: #0E0E12;
+      --bg-surface: #1F1F23;
+      --bg-surface-elevated: #28282E;
+      --border-subtle: #353439;
+      --border-violet: rgba(137, 24, 223, 0.4);
+      --accent-volt: #CCFF00;
+      --accent-volt-dark: #161E00;
+      --accent-violet: #660CAA;
+      --accent-violet-bright: #8918DF;
+      --accent-violet-light: #CEACEF;
+      --text-primary: #FFFFFF;
+      --text-secondary: #ACAAB0;
+      --text-muted: #727077;
+    }
+
+    body {
+      background-color: #08080A;
+      color: var(--text-primary);
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-heading {
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .font-technical {
+      font-family: 'Space Grotesk', monospace, sans-serif;
+    }
+
+    .glow-volt {
+      box-shadow: 0px 0px 16px 0px rgba(204, 255, 0, 0.28);
+    }
+
+    .glow-violet {
+      box-shadow: 0px 0px 24px 0px rgba(102, 12, 170, 0.45);
+    }
+
+    .glow-badge-violet {
+      box-shadow: 0px 0px 12px 0px rgba(137, 24, 223, 0.5);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0E0E12;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #353439;
+      border-radius: 4px;
+    }
+
+    /* Pulse animation for active rest timer */
+    @keyframes pulseGlow {
+      0%, 100% { border-color: rgba(204, 255, 0, 0.6); box-shadow: 0 0 15px rgba(204, 255, 0, 0.25); }
+      50% { border-color: rgba(137, 24, 223, 0.8); box-shadow: 0 0 20px rgba(102, 12, 170, 0.4); }
+    }
+    .active-timer-border {
+      animation: pulseGlow 2.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-6 min-h-screen flex flex-col items-center justify-start">
+
+  <!-- TOP BAR CONTROL / VIEW SWITCHER -->
+  <header class="w-full max-w-[420px] mb-4 flex items-center justify-between px-2">
+    <div class="flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#CCFF00] inline-block animate-ping"></span>
+      <span class="font-technical text-xs tracking-wider text-[#CCFF00] font-bold uppercase">Protótipo Interativo</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="btnToggleSim" onclick="toggleSimulatedRest()" class="font-technical text-xs px-2.5 py-1 rounded bg-[#1F1F23] border border-[#353439] hover:border-[#CCFF00] text-gray-300 transition">
+        ⏱ Simular Descanso
+      </button>
+      <button id="btnResetData" onclick="resetPrototype()" class="font-technical text-xs px-2.5 py-1 rounded bg-[#1F1F23] border border-[#353439] hover:border-red-400 text-gray-400 hover:text-red-300 transition">
+        ↺ Reiniciar
+      </button>
+    </div>
+  </header>
+
+  <!-- MOBILE DEVICE FRAME (Exact 390px mobile viewport matching Figma design) -->
+  <div class="w-full max-w-[390px] bg-[#0E0E12] border border-[#353439] rounded-[36px] shadow-2xl overflow-hidden relative flex flex-col pb-6">
+
+    <!-- STATUS BAR (Mobile mockup) -->
+    <div class="w-full px-6 pt-3 pb-1 flex justify-between items-center text-xs font-technical text-gray-400 select-none">
+      <span id="systemClock" class="font-bold text-white">09:41</span>
+      <div class="w-24 h-4 bg-black rounded-full mx-auto"></div>
+      <div class="flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L12 22l7.03-4.39C20.26 16.07 21 14.12 21 12c0-4.97-4.03-9-9-9z"/></svg>
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M2 17h20v4H2v-4zm0-6h20v4H2v-4zm0-6h20v4H2V5z"/></svg>
+        <span class="text-[10px] font-bold">100%</span>
+      </div>
+    </div>
+
+    <!-- APP HEADER (Treino Ativo) -->
+    <div class="px-4 py-3 border-b border-[#1F1F23] flex items-center justify-between sticky top-0 bg-[#0E0E12]/95 backdrop-blur z-20">
+      <button onclick="handleMinimize()" class="w-9 h-9 rounded-full bg-[#1F1F23] flex items-center justify-center text-gray-300 hover:text-white hover:bg-[#2A292E] transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-[#CCFF00]"></span>
+          <span class="font-technical text-[11px] font-bold tracking-wider text-[#CEACEF] uppercase">TREINO ATIVO</span>
+        </div>
+        <h1 class="font-heading font-black text-sm text-white tracking-wide">Treino A — Push</h1>
+      </div>
+
+      <button onclick="openFinishModal()" class="px-3 py-1.5 rounded-lg bg-[#660CAA] hover:bg-[#8918DF] text-white font-technical text-xs font-bold tracking-wider uppercase glow-violet transition">
+        Finalizar
+      </button>
+    </div>
+
+    <!-- SUB-BAR TELEMETRIA & CRONÔMETRO DE SESSÃO -->
+    <div class="px-4 py-2 bg-[#17171C] border-b border-[#252429] flex items-center justify-between text-xs font-technical">
+      <!-- Session duration -->
+      <div class="flex items-center gap-1.5 text-gray-300">
+        <svg class="w-3.5 h-3.5 text-[#CCFF00]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-gray-400">Tempo:</span>
+        <span id="sessionTimerDisplay" class="font-bold text-white tracking-wider">00:24:18</span>
+      </div>
+
+      <!-- Offline-first indicator badge (RNF01 / RNF07) -->
+      <div class="flex items-center gap-1.5 text-[11px] bg-[#1F1F23] px-2 py-0.5 rounded-full border border-[#353439] text-gray-300">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#CCFF00]"></span>
+        <span>Salvo local</span>
+        <span class="text-[#ACAAB0]">• 0 pendentes</span>
+      </div>
+    </div>
+
+    <!-- WORKOUT CAROUSEL / EXERCISE STEPPER -->
+    <div class="px-4 pt-3 pb-2">
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="font-technical text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+          EXERCÍCIO <span id="currentExerciseIndex" class="text-[#CCFF00]">1</span> DE 6
+        </span>
+        <span class="font-technical text-[11px] text-gray-400">
+          Peito & Ombros
+        </span>
+      </div>
+
+      <!-- Stepper Progress Dots -->
+      <div class="grid grid-cols-6 gap-1.5">
+        <div class="h-1.5 rounded-full bg-[#CCFF00] shadow-[0_0_8px_#CCFF00]"></div>
+        <div class="h-1.5 rounded-full bg-[#353439]"></div>
+        <div class="h-1.5 rounded-full bg-[#353439]"></div>
+        <div class="h-1.5 rounded-full bg-[#353439]"></div>
+        <div class="h-1.5 rounded-full bg-[#353439]"></div>
+        <div class="h-1.5 rounded-full bg-[#353439]"></div>
+      </div>
+    </div>
+
+    <!-- MAIN EXERCISE CARD (HERO CARD DE EXERCÍCIO) -->
+    <main class="px-4 py-2 space-y-3 flex-1 overflow-y-auto">
+
+      <!-- CARD: EXERCÍCIO ATUAL -->
+      <section class="bg-[#1F1F23] rounded-2xl p-4 border border-[#353439] relative overflow-hidden">
+        <!-- Glow roxo sutil no topo do card (Figma style) -->
+        <div class="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-[#660CAA] opacity-30 blur-2xl pointer-events-none"></div>
+
+        <div class="flex items-start justify-between relative z-10">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded bg-[#660CAA]/30 border border-[#8918DF]/50 text-[#CEACEF] font-technical text-[10px] font-bold uppercase">
+                COMPOSTO PRINCIPAL
+              </span>
+              <span class="font-technical text-xs text-gray-400">Meta: 4 séries • 6-8 reps</span>
+            </div>
+            <h2 id="exerciseTitle" class="font-heading font-black text-xl text-white tracking-tight leading-tight pt-0.5">
+              Supino Reto com Barra Olímpica
+            </h2>
+            <p class="text-xs text-[#ACAAB0]">
+              Peitoral Maior • Carga total (Barra 20kg + Anilhas)
+            </p>
+          </div>
+
+          <!-- Badge do número do exercício -->
+          <div class="w-8 h-8 rounded-lg bg-[#2A292E] border border-[#353439] flex items-center justify-center font-technical font-bold text-sm text-[#8918DF]">
+            01
+          </div>
+        </div>
+
+        <!-- AÇÕES RÁPIDAS DO EXERCÍCIO (RF03, RF17, RF18) -->
+        <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#2A292E] relative z-10">
+          <!-- Mini player sob demanda (RF03) -->
+          <button onclick="openVideoModal()" class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-[#2A292E] hover:bg-[#353439] border border-[#353439] text-xs font-technical text-gray-200 transition">
+            <svg class="w-3.5 h-3.5 text-[#CCFF00]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Execução</span>
+          </button>
+
+          <!-- Substituir exercício (RF17) -->
+          <button onclick="openReplaceModal()" class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-[#2A292E] hover:bg-[#353439] border border-[#353439] text-xs font-technical text-gray-200 transition">
+            <svg class="w-3.5 h-3.5 text-[#CEACEF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+            <span>Substituir</span>
+          </button>
+
+          <!-- Regulagens / Equipamento (RF18) -->
+          <button onclick="alert('Regulagens: Banco Reto Olímpico, Barra 20kg. Presilhas fixadas.')" class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-[#2A292E] hover:bg-[#353439] border border-[#353439] text-xs font-technical text-gray-200 transition">
+            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+            <span>Ajustes</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- REFERÊNCIA ANTERIOR (RF08 & RF15 - Preenchimento com 1 Toque) -->
+      <section class="bg-gradient-to-r from-[#1B1226] via-[#1F1F23] to-[#1B1B1F] rounded-xl p-3 border border-[#660CAA]/40 flex items-center justify-between">
+        <div class="space-y-0.5">
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#8918DF]"></span>
+            <span class="font-technical text-[10px] font-bold uppercase tracking-wider text-[#CEACEF]">
+              REFERÊNCIA ANTERIOR (08/10)
+            </span>
+          </div>
+          <p class="text-xs text-white font-technical font-medium">
+            Último: <strong class="text-[#CCFF00]">80 kg</strong> × 8 reps <span class="text-gray-400">(4 séries feitas)</span>
+          </p>
+        </div>
+
+        <button onclick="copyPreviousValues()" class="px-2.5 py-1.5 rounded-lg bg-[#2A292E] hover:bg-[#353439] border border-[#8918DF]/60 text-xs font-technical font-bold text-[#CEACEF] hover:text-white flex items-center gap-1 transition">
+          <svg class="w-3 h-3 text-[#CCFF00]" fill="currentColor" viewBox="0 0 20 20"><path d="M7 9a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9z"/><path d="M5 3a2 2 0 00-2 2v6a2 2 0 002 2V5h8a2 2 0 00-2-2H5z"/></svg>
+          <span>Copiar</span>
+        </button>
+      </section>
+
+      <!-- TABELA INTERATIVA DE SÉRIES (RF07, RF06, RNF04) -->
+      <section class="bg-[#1F1F23] rounded-2xl p-3 border border-[#353439] space-y-2.5">
+        <div class="flex items-center justify-between px-1">
+          <h3 class="font-heading font-black text-xs text-white uppercase tracking-wider">
+            Séries & Cargas
+          </h3>
+          <span class="text-[11px] font-technical text-gray-400">Descanso padrão: 90s</span>
+        </div>
+
+        <!-- Cabeçalho das Colunas -->
+        <div class="grid grid-cols-12 gap-1 px-1 text-[11px] font-technical text-gray-400 font-semibold uppercase tracking-wider">
+          <div class="col-span-2 text-center">Tipo</div>
+          <div class="col-span-3 text-center">Anterior</div>
+          <div class="col-span-3 text-center">Carga (kg)</div>
+          <div class="col-span-2 text-center">Reps</div>
+          <div class="col-span-2 text-center">Check</div>
+        </div>
+
+        <!-- LISTA DE SÉRIES (Dinâmica) -->
+        <div id="setsList" class="space-y-2">
+
+          <!-- Série 1 (Aquecimento - Concluída) -->
+          <div id="set-row-1" class="grid grid-cols-12 gap-1 items-center bg-[#17171C] p-2 rounded-xl border border-[#2A292E]">
+            <div class="col-span-2 flex justify-center">
+              <span class="w-6 h-6 rounded-md bg-[#EAB308]/20 border border-[#EAB308]/40 text-[#FACC15] font-technical text-xs font-bold flex items-center justify-center" title="Série de Aquecimento">
+                A
+              </span>
+            </div>
+            <div class="col-span-3 text-center font-technical text-xs text-gray-400">
+              40kg × 12
+            </div>
+            <div class="col-span-3">
+              <input type="text" value="40" disabled class="w-full bg-[#101014] text-center font-technical font-bold text-xs py-1.5 rounded border border-[#2A292E] text-gray-400">
+            </div>
+            <div class="col-span-2">
+              <input type="text" value="12" disabled class="w-full bg-[#101014] text-center font-technical font-bold text-xs py-1.5 rounded border border-[#2A292E] text-gray-400">
+            </div>
+            <div class="col-span-2 flex justify-center">
+              <button onclick="toggleSet(1)" class="w-8 h-8 rounded-lg bg-[#CCFF00] text-[#161E00] flex items-center justify-center glow-volt transition">
+                <svg class="w-4 h-4 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Série 2 (Trabalho - Ativa / Em Edição) -->
+          <div id="set-row-2" class="space-y-2 bg-[#25242C] p-2.5 rounded-xl border-2 border-[#CCFF00]/70 shadow-lg">
+            <div class="grid grid-cols-12 gap-1 items-center">
+              <div class="col-span-2 flex justify-center">
+                <span class="w-6 h-6 rounded-md bg-[#660CAA] text-white font-technical text-xs font-bold flex items-center justify-center glow-badge-violet" title="Série de Trabalho">
+                  1
+                </span>
+              </div>
+              <div class="col-span-3 text-center font-technical text-xs text-gray-300">
+                80kg × 8
+              </div>
+              <div class="col-span-3">
+                <input id="inputWeight" type="number" step="0.5" value="80" class="w-full bg-[#101014] text-center font-technical font-bold text-sm py-1.5 rounded-lg border border-[#CCFF00] text-white focus:outline-none">
+              </div>
+              <div class="col-span-2">
+                <input id="inputReps" type="number" value="8" class="w-full bg-[#101014] text-center font-technical font-bold text-sm py-1.5 rounded-lg border border-[#CCFF00] text-white focus:outline-none">
+              </div>
+              <div class="col-span-2 flex justify-center">
+                <button id="btnConfirmActiveSet" onclick="confirmActiveSet()" class="w-8 h-8 rounded-lg bg-[#CCFF00] hover:bg-[#B8E600] text-[#161E00] flex items-center justify-center font-bold glow-volt transition">
+                  <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- TECLADO RÁPIDO DE INCREMENTO (RNF04 - Otimização de Entrada) -->
+            <div class="flex items-center justify-between pt-1 border-t border-[#353439]/60 px-1">
+              <span class="text-[10px] font-technical text-[#CEACEF] uppercase font-bold">Ajuste rápido:</span>
+              <div class="flex items-center gap-1 font-technical text-xs">
+                <button onclick="adjustWeight(-2)" class="px-2 py-0.5 rounded bg-[#1F1F23] border border-[#353439] hover:border-gray-400 text-gray-300">-2kg</button>
+                <button onclick="adjustWeight(1)" class="px-2 py-0.5 rounded bg-[#1F1F23] border border-[#353439] hover:border-[#CCFF00] text-[#CCFF00] font-bold">+1kg</button>
+                <button onclick="adjustWeight(2)" class="px-2 py-0.5 rounded bg-[#1F1F23] border border-[#353439] hover:border-[#CCFF00] text-[#CCFF00] font-bold">+2kg</button>
+                <button onclick="adjustWeight(5)" class="px-2 py-0.5 rounded bg-[#1F1F23] border border-[#353439] hover:border-[#CCFF00] text-[#CCFF00] font-bold">+5kg</button>
+              </div>
+            </div>
+
+            <!-- REGISTRO DE RIR / FALHA (RF13 & RF06) -->
+            <div class="flex items-center justify-between pt-1 px-1 text-[11px] font-technical">
+              <div class="flex items-center gap-1.5">
+                <span class="text-gray-400">RIR:</span>
+                <select id="selectRIR" class="bg-[#101014] text-white rounded px-1.5 py-0.5 border border-[#353439] focus:outline-none">
+                  <option value="0">0 (Falha técnica)</option>
+                  <option value="1">1 (1 rep na reserva)</option>
+                  <option value="2" selected>2 (2 reps na reserva)</option>
+                  <option value="3">3 (3 reps na reserva)</option>
+                </select>
+              </div>
+              <label class="flex items-center gap-1.5 text-gray-300 cursor-pointer">
+                <input type="checkbox" id="checkFailure" class="rounded bg-[#101014] border-[#353439] text-[#CCFF00] focus:ring-0">
+                <span class="text-[10px] uppercase font-bold text-red-400">Falha Total</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Série 3 (Pendente) -->
+          <div id="set-row-3" class="grid grid-cols-12 gap-1 items-center bg-[#17171C] p-2 rounded-xl border border-[#2A292E] opacity-75">
+            <div class="col-span-2 flex justify-center">
+              <span class="w-6 h-6 rounded-md bg-[#2A292E] text-gray-400 font-technical text-xs font-bold flex items-center justify-center">
+                2
+              </span>
+            </div>
+            <div class="col-span-3 text-center font-technical text-xs text-gray-500">
+              80kg × 8
+            </div>
+            <div class="col-span-3">
+              <input type="text" value="80" disabled class="w-full bg-[#101014] text-center font-technical text-xs py-1.5 rounded border border-[#2A292E] text-gray-500">
+            </div>
+            <div class="col-span-2">
+              <input type="text" value="8" disabled class="w-full bg-[#101014] text-center font-technical text-xs py-1.5 rounded border border-[#2A292E] text-gray-500">
+            </div>
+            <div class="col-span-2 flex justify-center">
+              <button disabled class="w-8 h-8 rounded-lg bg-[#2A292E] text-gray-600 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Série 4 (Pendente) -->
+          <div id="set-row-4" class="grid grid-cols-12 gap-1 items-center bg-[#17171C] p-2 rounded-xl border border-[#2A292E] opacity-50">
+            <div class="col-span-2 flex justify-center">
+              <span class="w-6 h-6 rounded-md bg-[#2A292E] text-gray-400 font-technical text-xs font-bold flex items-center justify-center">
+                3
+              </span>
+            </div>
+            <div class="col-span-3 text-center font-technical text-xs text-gray-500">
+              80kg × 6
+            </div>
+            <div class="col-span-3">
+              <input type="text" value="80" disabled class="w-full bg-[#101014] text-center font-technical text-xs py-1.5 rounded border border-[#2A292E] text-gray-500">
+            </div>
+            <div class="col-span-2">
+              <input type="text" value="6" disabled class="w-full bg-[#101014] text-center font-technical text-xs py-1.5 rounded border border-[#2A292E] text-gray-500">
+            </div>
+            <div class="col-span-2 flex justify-center">
+              <button disabled class="w-8 h-8 rounded-lg bg-[#2A292E] text-gray-600 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- BOTÃO ADICIONAR SÉRIE -->
+        <button onclick="addNewSetRow()" class="w-full py-2 rounded-xl border border-dashed border-[#353439] hover:border-[#CCFF00] text-gray-400 hover:text-white font-technical text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition">
+          <svg class="w-4 h-4 text-[#CCFF00]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span>Adicionar Série</span>
+        </button>
+      </section>
+
+      <!-- CARD: PRÓXIMO EXERCÍCIO -->
+      <section class="bg-[#17171C] rounded-xl p-3 border border-[#2A292E] flex items-center justify-between">
+        <div class="space-y-0.5">
+          <span class="font-technical text-[10px] font-bold uppercase tracking-wider text-gray-500">
+            A SEGUIR (EXERCÍCIO 02)
+          </span>
+          <p class="text-xs font-heading font-bold text-white">
+            Desenvolvimento Halteres Banco 75°
+          </p>
+          <p class="text-[11px] text-gray-400 font-technical">
+            3 séries • 24kg por halter
+          </p>
+        </div>
+
+        <button onclick="nextExercise()" class="w-8 h-8 rounded-lg bg-[#2A292E] hover:bg-[#353439] flex items-center justify-center text-gray-300 hover:text-white transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </section>
+
+    </main>
+
+    <!-- TIMER DE DESCANSO PERSISTENTE FLUTUANTE (RF09 & RNF06) -->
+    <div id="restTimerBar" class="mx-3 mt-2 mb-1 p-3 bg-gradient-to-r from-[#1B1822] to-[#141418] rounded-2xl border-2 border-[#CCFF00]/50 active-timer-border shadow-xl flex items-center justify-between relative overflow-hidden transition-all duration-300">
+      <!-- Background subtle progress bar -->
+      <div id="restProgressBg" class="absolute left-0 bottom-0 top-0 bg-[#CCFF00]/10 transition-all duration-1000" style="width: 65%;"></div>
+
+      <div class="relative z-10 flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-full bg-[#101014] border border-[#CCFF00] flex items-center justify-center text-[#CCFF00]">
+          <svg class="w-5 h-5 animate-spin" style="animation-duration: 4s;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#CCFF00] animate-ping"></span>
+            <span class="font-technical text-[10px] font-bold text-[#CCFF00] uppercase tracking-wider">DESCANSO EM CURSO</span>
+          </div>
+          <div class="font-technical font-black text-lg text-white tracking-widest leading-none pt-0.5">
+            <span id="restTimerDisplay">01:08</span> <span class="text-xs text-gray-400 font-normal">/ 01:30</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative z-10 flex items-center gap-1.5 font-technical text-xs font-bold">
+        <button onclick="addRestTime(30)" class="px-2.5 py-1.5 rounded-lg bg-[#25242C] hover:bg-[#353439] text-[#CCFF00] border border-[#353439] transition">
+          +30s
+        </button>
+        <button onclick="skipRestTime()" class="px-2.5 py-1.5 rounded-lg bg-[#660CAA] hover:bg-[#8918DF] text-white glow-badge-violet transition">
+          Pular
+        </button>
+      </div>
+    </div>
+
+    <!-- DOCK INFERIOR DE NAVEGAÇÃO ENTRE EXERCÍCIOS -->
+    <footer class="px-4 pt-2 flex items-center justify-between border-t border-[#1F1F23] bg-[#0E0E12]">
+      <button onclick="alert('Este é o primeiro exercício da rotina.')" class="px-3 py-2 rounded-xl bg-[#17171C] text-gray-500 font-technical text-xs font-bold flex items-center gap-1 cursor-not-allowed">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        <span>Anterior</span>
+      </button>
+
+      <span class="font-technical text-[11px] text-gray-400">
+        4 de 18 séries feitas
+      </span>
+
+      <button onclick="nextExercise()" class="px-3 py-2 rounded-xl bg-[#2A292E] hover:bg-[#353439] text-[#CCFF00] font-technical text-xs font-bold flex items-center gap-1 transition">
+        <span>Próximo</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </footer>
+
+  </div>
+
+  <!-- MODAL: DEMONSTRAÇÃO EM VÍDEO / MINI PLAYER SOB DEMANDA (RF03) -->
+  <div id="videoModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#1F1F23] border border-[#353439] rounded-2xl w-full max-w-[360px] overflow-hidden shadow-2xl space-y-3 p-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-[#CCFF00]"></span>
+          <span class="font-technical text-xs font-bold text-[#CEACEF] uppercase">DEMONSTRAÇÃO TÉCNICA</span>
+        </div>
+        <button onclick="closeVideoModal()" class="text-gray-400 hover:text-white">✕</button>
+      </div>
+
+      <!-- Simulador de Mini Player Mudo (RNF03) -->
+      <div class="w-full h-48 bg-[#0E0E12] rounded-xl border border-[#2A292E] flex flex-col items-center justify-center relative overflow-hidden">
+        <div class="w-16 h-16 rounded-full bg-[#660CAA]/40 border border-[#8918DF] flex items-center justify-center text-[#CCFF00] mb-2 animate-pulse">
+          <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <span class="font-technical text-xs text-gray-300 font-bold">Player Mudo • H.264 480p</span>
+        <span class="text-[11px] text-gray-500">Música de fundo não será interrompida</span>
+
+        <!-- Badge mudo fixo -->
+        <div class="absolute top-2 right-2 bg-black/70 px-2 py-0.5 rounded text-[10px] font-technical text-gray-300 flex items-center gap-1">
+          <svg class="w-3 h-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+          <span>Sem som</span>
+        </div>
+      </div>
+
+      <!-- Instruções Técnicas -->
+      <div class="space-y-1.5 text-xs text-gray-300 font-sans bg-[#17171C] p-3 rounded-xl border border-[#2A292E]">
+        <h4 class="font-technical font-bold text-white text-xs uppercase text-[#CCFF00]">Pontos de Atenção:</h4>
+        <ul class="list-disc list-inside space-y-1 text-gray-400">
+          <li>Pegada um pouco além da largura dos ombros.</li>
+          <li>Escápulas retraídas e deprimidas no banco.</li>
+          <li>Barra toca suavemente a linha dos mamilos.</li>
+        </ul>
+      </div>
+
+      <button onclick="closeVideoModal()" class="w-full py-2 rounded-xl bg-[#2A292E] hover:bg-[#353439] text-white font-technical text-xs font-bold uppercase transition">
+        Fechar Demonstração
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: SUBSTITUIÇÃO DE EXERCÍCIO (RF17) -->
+  <div id="replaceModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#1F1F23] border border-[#353439] rounded-2xl w-full max-w-[360px] overflow-hidden shadow-2xl space-y-3 p-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-heading font-black text-sm text-white uppercase">Substituir Exercício</h3>
+        <button onclick="closeReplaceModal()" class="text-gray-400 hover:text-white">✕</button>
+      </div>
+
+      <p class="text-xs text-gray-400">
+        Escolha uma alternativa compatível. As séries já concluídas no supino serão preservadas.
+      </p>
+
+      <div class="space-y-2">
+        <label class="flex items-center justify-between p-2.5 rounded-xl bg-[#17171C] border border-[#CCFF00] cursor-pointer">
+          <div class="text-xs">
+            <p class="font-bold text-white">Supino Reto com Halteres</p>
+            <p class="text-gray-400 text-[11px]">Halteres • Carga por implemento</p>
+          </div>
+          <input type="radio" name="substitute" checked class="text-[#CCFF00] focus:ring-0">
+        </label>
+
+        <label class="flex items-center justify-between p-2.5 rounded-xl bg-[#17171C] border border-[#2A292E] cursor-pointer hover:border-gray-500">
+          <div class="text-xs">
+            <p class="font-bold text-white">Supino na Máquina Articulada</p>
+            <p class="text-gray-400 text-[11px]">Máquina • Ajuste banco 3</p>
+          </div>
+          <input type="radio" name="substitute" class="text-[#CCFF00] focus:ring-0">
+        </label>
+      </div>
+
+      <div class="pt-2 border-t border-[#2A292E] space-y-2">
+        <p class="text-[11px] font-technical text-[#CEACEF]">Onde aplicar a troca?</p>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="confirmReplace(false)" class="py-2 px-3 rounded-lg bg-[#2A292E] hover:bg-[#353439] text-white font-technical text-xs font-bold">
+            Apenas Hoje
+          </button>
+          <button onclick="confirmReplace(true)" class="py-2 px-3 rounded-lg bg-[#660CAA] hover:bg-[#8918DF] text-white font-technical text-xs font-bold glow-badge-violet">
+            Atualizar Ficha
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FINALIZAR TREINO COM RESUMO -->
+  <div id="finishModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#1F1F23] border border-[#8918DF] rounded-2xl w-full max-w-[360px] overflow-hidden shadow-2xl p-5 space-y-4">
+      <div class="text-center space-y-1">
+        <div class="w-12 h-12 rounded-full bg-[#CCFF00]/20 border border-[#CCFF00] mx-auto flex items-center justify-center text-[#CCFF00] glow-volt">
+          <svg class="w-6 h-6 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h3 class="font-heading font-black text-lg text-white">Treino Concluído!</h3>
+        <p class="text-xs text-gray-400">Resumo da sessão gravado localmente.</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 bg-[#17171C] p-3 rounded-xl border border-[#2A292E] text-center font-technical">
+        <div>
+          <span class="text-[10px] text-gray-500 uppercase">Duração</span>
+          <p class="font-bold text-white text-sm" id="finishDuration">24 min</p>
+        </div>
+        <div>
+          <span class="text-[10px] text-gray-500 uppercase">Séries</span>
+          <p class="font-bold text-white text-sm">18 / 18</p>
+        </div>
+        <div>
+          <span class="text-[10px] text-gray-500 uppercase">Volume</span>
+          <p class="font-bold text-[#CCFF00] text-sm">6.980 kg</p>
+        </div>
+      </div>
+
+      <!-- Novo Recorde Detectado (RF11) -->
+      <div class="bg-[#660CAA]/20 border border-[#8918DF] p-2.5 rounded-xl flex items-center gap-2">
+        <span class="text-lg">🏆</span>
+        <div class="text-xs">
+          <p class="font-bold text-white font-technical">Novo Recorde Pessoal (PR)!</p>
+          <p class="text-[#CEACEF] text-[11px]">Supino Reto: 82 kg em 8 reps (+2 kg superados)</p>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="closeFinishModal()" class="flex-1 py-2 rounded-xl bg-[#2A292E] text-gray-300 font-technical text-xs font-bold hover:text-white">
+          Voltar
+        </button>
+        <button onclick="alert('Treino salvo com sucesso no banco SQLite Drift local!'); closeFinishModal();" class="flex-1 py-2 rounded-xl bg-[#CCFF00] hover:bg-[#B8E600] text-[#161E00] font-technical text-xs font-black uppercase tracking-wider glow-volt">
+          Salvar & Sair
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIC (Interatividade Completa) -->
+  <script>
+    // System clock ticker
+    function updateClock() {
+      const now = new Date();
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('systemClock').innerText = `${hrs}:${mins}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Session duration ticker
+    let sessionSeconds = 24 * 60 + 18;
+    setInterval(() => {
+      sessionSeconds++;
+      const hrs = String(Math.floor(sessionSeconds / 3600)).padStart(2, '0');
+      const mins = String(Math.floor((sessionSeconds % 3600) / 60)).padStart(2, '0');
+      const secs = String(sessionSeconds % 60).padStart(2, '0');
+      document.getElementById('sessionTimerDisplay').innerText = `${mins}:${secs}`;
+    }, 1000);
+
+    // Rest countdown timer
+    let restRemaining = 68;
+    const restTotal = 90;
+    let restInterval = null;
+
+    function startRestTimer() {
+      if (restInterval) clearInterval(restInterval);
+      const restBar = document.getElementById('restTimerBar');
+      restBar.classList.remove('opacity-50', 'pointer-events-none');
+
+      restInterval = setInterval(() => {
+        if (restRemaining > 0) {
+          restRemaining--;
+          updateRestDisplay();
+        } else {
+          clearInterval(restInterval);
+          document.getElementById('restTimerDisplay').innerText = "00:00";
+          // Vibrar / notificar visualmente
+          document.getElementById('restTimerBar').classList.add('border-[#CCFF00]', 'glow-volt');
+        }
+      }, 1000);
+      updateRestDisplay();
+    }
+
+    function updateRestDisplay() {
+      const m = String(Math.floor(restRemaining / 60)).padStart(2, '0');
+      const s = String(restRemaining % 60).padStart(2, '0');
+      document.getElementById('restTimerDisplay').innerText = `${m}:${s}`;
+      const pct = Math.max(0, Math.min(100, (restRemaining / restTotal) * 100));
+      document.getElementById('restProgressBg').style.width = `${pct}%`;
+    }
+
+    function addRestTime(seconds) {
+      restRemaining += seconds;
+      updateRestDisplay();
+    }
+
+    function skipRestTime() {
+      restRemaining = 0;
+      updateRestDisplay();
+      clearInterval(restInterval);
+      document.getElementById('restTimerDisplay').innerText = "00:00";
+    }
+
+    function toggleSimulatedRest() {
+      restRemaining = 90;
+      startRestTimer();
+    }
+
+    // Weight adjustments
+    function adjustWeight(delta) {
+      const input = document.getElementById('inputWeight');
+      let val = parseFloat(input.value) || 0;
+      val = Math.max(0, val + delta);
+      input.value = val;
+    }
+
+    // One-touch copy (RF15)
+    function copyPreviousValues() {
+      document.getElementById('inputWeight').value = "80";
+      document.getElementById('inputReps').value = "8";
+      const btn = event.currentTarget;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<span class="text-[#CCFF00]">✓ Copiado</span>`;
+      setTimeout(() => btn.innerHTML = originalText, 1500);
+    }
+
+    // Confirm Active Set (RF07)
+    function confirmActiveSet() {
+      const weight = document.getElementById('inputWeight').value;
+      const reps = document.getElementById('inputReps').value;
+
+      // Update UI row to completed state
+      const row = document.getElementById('set-row-2');
+      row.className = "grid grid-cols-12 gap-1 items-center bg-[#17171C] p-2 rounded-xl border border-[#2A292E]";
+      row.innerHTML = `
+        <div class="col-span-2 flex justify-center">
+          <span class="w-6 h-6 rounded-md bg-[#660CAA] text-white font-technical text-xs font-bold flex items-center justify-center glow-badge-violet">1</span>
+        </div>
+        <div class="col-span-3 text-center font-technical text-xs text-gray-400">80kg × 8</div>
+        <div class="col-span-3">
+          <input type="text" value="${weight}" disabled class="w-full bg-[#101014] text-center font-technical font-bold text-xs py-1.5 rounded border border-[#2A292E] text-white">
+        </div>
+        <div class="col-span-2">
+          <input type="text" value="${reps}" disabled class="w-full bg-[#101014] text-center font-technical font-bold text-xs py-1.5 rounded border border-[#2A292E] text-white">
+        </div>
+        <div class="col-span-2 flex justify-center">
+          <button class="w-8 h-8 rounded-lg bg-[#CCFF00] text-[#161E00] flex items-center justify-center glow-volt">
+            <svg class="w-4 h-4 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          </button>
+        </div>
+      `;
+
+      // Activate next row (Série 3)
+      const nextRow = document.getElementById('set-row-3');
+      nextRow.className = "space-y-2 bg-[#25242C] p-2.5 rounded-xl border-2 border-[#CCFF00]/70 shadow-lg";
+      nextRow.innerHTML = `
+        <div class="grid grid-cols-12 gap-1 items-center">
+          <div class="col-span-2 flex justify-center">
+            <span class="w-6 h-6 rounded-md bg-[#660CAA] text-white font-technical text-xs font-bold flex items-center justify-center glow-badge-violet">2</span>
+          </div>
+          <div class="col-span-3 text-center font-technical text-xs text-gray-300">80kg × 8</div>
+          <div class="col-span-3">
+            <input id="inputWeight" type="number" step="0.5" value="${weight}" class="w-full bg-[#101014] text-center font-technical font-bold text-sm py-1.5 rounded-lg border border-[#CCFF00] text-white focus:outline-none">
+          </div>
+          <div class="col-span-2">
+            <input id="inputReps" type="number" value="${reps}" class="w-full bg-[#101014] text-center font-technical font-bold text-sm py-1.5 rounded-lg border border-[#CCFF00] text-white focus:outline-none">
+          </div>
+          <div class="col-span-2 flex justify-center">
+            <button onclick="confirmActiveSet()" class="w-8 h-8 rounded-lg bg-[#CCFF00] hover:bg-[#B8E600] text-[#161E00] flex items-center justify-center font-bold glow-volt transition">
+              <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="flex items-center justify-between pt-1 border-t border-[#353439]/60 px-1">
+          <span class="text-[10px] font-technical text-[#CEACEF] uppercase font-bold">Ajuste rápido:</span>
+          <div class="flex items-center gap-1 font-technical text-xs">
+            <button onclick="adjustWeight(-2)" class="px-2 py-0.5 rounded bg-[#1F1F23] border border-[#353439] text-gray-300">-2kg</button>
+            <button onclick="adjustWeight(1)" class="px-2 py-0.5 rounded bg-[#1F1F23] border border-[#353439] text-[#CCFF00] font-bold">+1kg</button>
+            <button onclick="adjustWeight(2)" class="px-2 py-0.5 rounded bg-[#1F1F23] border border-[#353439] text-[#CCFF00] font-bold">+2kg</button>
+            <button onclick="adjustWeight(5)" class="px-2 py-0.5 rounded bg-[#1F1F23] border border-[#353439] text-[#CCFF00] font-bold">+5kg</button>
+          </div>
+        </div>
+      `;
+
+      // Trigger rest timer! (RF09)
+      restRemaining = 90;
+      startRestTimer();
+    }
+
+    function addNewSetRow() {
+      const list = document.getElementById('setsList');
+      const count = list.children.length + 1;
+      const newDiv = document.createElement('div');
+      newDiv.className = "grid grid-cols-12 gap-1 items-center bg-[#17171C] p-2 rounded-xl border border-[#2A292E]";
+      newDiv.innerHTML = `
+        <div class="col-span-2 flex justify-center">
+          <span class="w-6 h-6 rounded-md bg-[#2A292E] text-gray-400 font-technical text-xs font-bold flex items-center justify-center">${count - 1}</span>
+        </div>
+        <div class="col-span-3 text-center font-technical text-xs text-gray-500">80kg × 6</div>
+        <div class="col-span-3">
+          <input type="text" value="80" disabled class="w-full bg-[#101014] text-center font-technical text-xs py-1.5 rounded border border-[#2A292E] text-gray-500">
+        </div>
+        <div class="col-span-2">
+          <input type="text" value="6" disabled class="w-full bg-[#101014] text-center font-technical text-xs py-1.5 rounded border border-[#2A292E] text-gray-500">
+        </div>
+        <div class="col-span-2 flex justify-center">
+          <button disabled class="w-8 h-8 rounded-lg bg-[#2A292E] text-gray-600 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </button>
+        </div>
+      `;
+      list.appendChild(newDiv);
+    }
+
+    function nextExercise() {
+      document.getElementById('currentExerciseIndex').innerText = "2";
+      document.getElementById('exerciseTitle').innerText = "Desenvolvimento Halteres Banco 75°";
+      alert("Avançando para o Exercício 02: Desenvolvimento Halteres Banco 75°");
+    }
+
+    function handleMinimize() {
+      alert("Treino minimizado em segundo plano. O cronômetro e o descanso continuam ativos conforme RNF06.");
+    }
+
+    // Modal helpers
+    function openVideoModal() { document.getElementById('videoModal').classList.remove('hidden'); }
+    function closeVideoModal() { document.getElementById('videoModal').classList.add('hidden'); }
+    function openReplaceModal() { document.getElementById('replaceModal').classList.remove('hidden'); }
+    function closeReplaceModal() { document.getElementById('replaceModal').classList.add('hidden'); }
+    function confirmReplace(updateRoutine) {
+      closeReplaceModal();
+      document.getElementById('exerciseTitle').innerText = "Supino Reto com Halteres";
+      alert(`Exercício substituído por Supino com Halteres (${updateRoutine ? 'Ficha e sessão atualizadas' : 'Apenas nesta sessão'}). Históricos preservados separadamente (RF17).`);
+    }
+    function openFinishModal() { document.getElementById('finishModal').classList.remove('hidden'); }
+    function closeFinishModal() { document.getElementById('finishModal').classList.add('hidden'); }
+
+    function resetPrototype() {
+      location.reload();
+    }
+
+    // Start rest timer automatically on load
+    startRestTimer();
+  </script>
+</body>
+</html>
